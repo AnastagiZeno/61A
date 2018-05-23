@@ -22,6 +22,8 @@ def roll_dice(num_rolls, dice=six_sided):
     assert num_rolls > 0, 'Must roll at least once.'
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
+    rolls = [dice() for _ in range(num_rolls)]
+    return 1 if 1 in rolls else sum(rolls)
     # END PROBLEM 1
 
 
@@ -33,6 +35,10 @@ def free_bacon(score):
     assert score < 100, 'The game should be over.'
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    if score < 10:
+        return 2 + score
+    tens, ones = int(score/10), score%10
+    return 2 + tens - ones if tens > ones else 2 + ones - tens
     # END PROBLEM 2
 
 
@@ -51,6 +57,7 @@ def take_turn(num_rolls, opponent_score, dice=six_sided):
     assert opponent_score < 100, 'The game should be over.'
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    return roll_dice(num_rolls, dice) if num_rolls > 0 else free_bacon(opponent_score)
     # END PROBLEM 3
 
 
@@ -58,7 +65,13 @@ def is_swap(score0, score1):
     """Return whether one of the scores is an integer multiple of the other."""
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
-    # END PROBLEM 4
+    if score0 <= 1 or score1 <= 1:
+        return False
+    bigger, smaller = (score0, score1) if score0 > score1 else (score1, score0)
+    remainder = float(bigger)/smaller
+    if remainder == int(remainder):
+        return True
+    return False
 
 
 def other(player):
@@ -97,6 +110,27 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
     player = 0  # Which player is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+
+    if score0 >= goal or score1 >=goal:
+        return score0, score1
+    # for current user
+    score0 += take_turn(strategy0(score0, score1), score1, dice)
+
+    if is_swap(score0, score1):
+        score0, score1 = score1, score0
+
+    if score0 >= goal or score1 >= goal:
+        return score0, score1
+
+    # for opponent user
+    score1 += take_turn(strategy1(score1, score0), score0, dice)
+
+    if is_swap(score0, score1):
+        score0, score1 = score1, score0
+
+    # recursive
+    if score0 <= goal and score1 <= goal:
+        return play(strategy0, strategy1, score0, score1, dice, goal, say)
     # END PROBLEM 5
     return score0, score1
 
