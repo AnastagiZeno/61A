@@ -118,6 +118,8 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
 
     if is_swap(score0, score1):
         score0, score1 = score1, score0
+    # say after current user's turn
+    say = say(score0, score1)
 
     if score0 >= goal or score1 >= goal:
         return score0, score1
@@ -127,6 +129,8 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
 
     if is_swap(score0, score1):
         score0, score1 = score1, score0
+    # say after oppnent user's turn
+    say = say(score0, score1)
 
     # recursive
     if score0 <= goal and score1 <= goal:
@@ -206,6 +210,18 @@ def announce_highest(who, previous_high=0, previous_score=0):
     assert who == 0 or who == 1, 'The who argument should indicate a player.'
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+
+    def say(score0, score1):
+        score = score0 if who == 0 else score1
+        gain = score - previous_score
+        if gain > previous_high:
+            new_previous_high = gain
+            print("%d point%s! That's the biggest gain yet for Player %d" % (gain, 's' if gain > 1 else '', who))
+        else:
+            new_previous_high = previous_high
+        new_previous_score = score
+        return announce_highest(who, new_previous_high, new_previous_score)
+    return say
     # END PROBLEM 7
 
 
@@ -245,6 +261,9 @@ def make_averaged(fn, num_samples=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def _return(*args):
+        return sum([fn(*args) for _ in range(num_samples)])/float(num_samples)
+    return _return
     # END PROBLEM 8
 
 
@@ -259,6 +278,15 @@ def max_scoring_num_rolls(dice=six_sided, num_samples=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    max_scoring_num, max_scoring = 1, 0
+    for num_rolls in range(1, 11):
+        averaged_roll = make_averaged(roll_dice, num_samples=num_samples)
+        averaged = averaged_roll(num_rolls, dice)
+        if averaged > max_scoring:
+            max_scoring = averaged
+            max_scoring_num = num_rolls
+    return max_scoring_num
+
     # END PROBLEM 9
 
 
@@ -307,7 +335,11 @@ def bacon_strategy(score, opponent_score, margin=8, num_rolls=4):
     rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return 4  # Replace this statement
+    gain = free_bacon(opponent_score)
+    # my_score = current_score if not is_swap(current_score, opponent_score) else opponent_score
+    if gain >= margin:
+        return 0
+    return num_rolls
     # END PROBLEM 10
 
 
@@ -317,7 +349,12 @@ def swap_strategy(score, opponent_score, margin=8, num_rolls=4):
     NUM_ROLLS.
     """
     # BEGIN PROBLEM 11
-    return 4  # Replace this statement
+    gain = free_bacon(opponent_score)
+    if is_swap(score + gain, opponent_score) and score + gain < opponent_score:
+        return 0
+    if gain >= margin:
+        return 0
+    return num_rolls  # Replace this statement
     # END PROBLEM 11
 
 
@@ -327,7 +364,16 @@ def final_strategy(score, opponent_score):
     *** YOUR DESCRIPTION HERE ***
     """
     # BEGIN PROBLEM 12
-    return 4  # Replace this statement
+    gain = free_bacon(opponent_score)
+    if is_swap(score + gain, opponent_score) and score + gain < opponent_score:
+        return 0
+    if gain >= 10:
+        return 0
+    if score > opponent_score and score > 50:
+        return 2
+    if score < opponent_score:
+        return 8
+    return 6  # Replace this statement
     # END PROBLEM 12
 
 
