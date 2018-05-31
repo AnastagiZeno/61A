@@ -20,6 +20,16 @@ def find_closest(location, centroids):
     """
     # BEGIN Question 3
     "*** YOUR CODE HERE ***"
+    assert location and centroids
+    minimum_dist, minimum_idx = distance(location, centroids[0]), 0
+    for idx, centroid in enumerate(centroids):
+        current_dist = distance(location, centroid)
+        if current_dist < minimum_dist:
+            minimum_dist = current_dist
+            minimum_idx = idx
+    return centroids[minimum_idx]
+
+    return min(centroids, key=lambda x: distance(x, location))
     # END Question 3
 
 
@@ -49,6 +59,18 @@ def group_by_centroid(restaurants, centroids):
     """
     # BEGIN Question 4
     "*** YOUR CODE HERE ***"
+
+    bucket = [[] for _ in centroids]
+    for r in restaurants:
+        if not isinstance(r, dict):
+            continue
+        nearest_centroid = find_closest(r['location'], centroids)
+        idx = centroids.index(nearest_centroid)
+        bucket[idx].append(r)
+    return [_ for _ in bucket if _]
+
+
+
     # END Question 4
 
 
