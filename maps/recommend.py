@@ -110,7 +110,16 @@ def find_predictor(user, restaurants, feature_fn):
     ys = [reviews_by_user[restaurant_name(r)] for r in restaurants]
 
     # BEGIN Question 7
-    b, a, r_squared = 0, 0, 0  # REPLACE THIS LINE WITH YOUR SOLUTION
+    # b, a, r_squared = 0, 0, 0  # REPLACE THIS LINE WITH YOUR SOLUTION
+    m_x = mean(xs)
+    m_y = mean(ys)
+    sxx = sum([(_ - m_x) * (_ - m_x) for _ in xs])
+    syy = sum([(_ - m_y) * (_ - m_y) for _ in ys])
+    xys = zip(xs, ys)
+    sxy = sum([(_[0] - m_x) * (_[1] - m_y) for _ in xys])
+    b = sxy / sxx
+    a = m_y - b * m_x
+    r_squared = sxy * sxy / (sxx * syy)
     # END Question 7
 
     def predictor(restaurant):
@@ -131,6 +140,7 @@ def best_predictor(user, restaurants, feature_fns):
     reviewed = user_reviewed_restaurants(user, restaurants)
     # BEGIN Question 8
     "*** YOUR CODE HERE ***"
+    return max([find_predictor(user, reviewed, feature_fn) for feature_fn in feature_fns], key=lambda x: x[1])[0]
     # END Question 8
 
 
@@ -147,11 +157,12 @@ def rate_all(user, restaurants, feature_fns):
     reviewed = user_reviewed_restaurants(user, restaurants)
     # BEGIN Question 9
     "*** YOUR CODE HERE ***"
+    return {restaurant_name(restaurant): user_rating(user, restaurant_name(restaurant)) if restaurant in reviewed else predictor(restaurant) for restaurant in restaurants}
     # END Question 9
 
 
 def search(query, restaurants):
-    """Return each restaurant in restaurants that has query as a category.
+    """Return each restaurant in that has query as a category.
 
     Arguments:
     query -- A string
@@ -159,6 +170,7 @@ def search(query, restaurants):
     """
     # BEGIN Question 10
     "*** YOUR CODE HERE ***"
+    return [restaurant for restaurant in restaurants if query in restaurant_categories(restaurant)]
     # END Question 10
 
 
@@ -225,13 +237,3 @@ def main(*args):
     else:
         centroids = [restaurant_location(r) for r in restaurants]
     draw_map(centroids, restaurants, ratings)
-
-
-if __name__ == '__main__':
-    r1 = make_restaurant('A', [-10, 2], [], 2, [make_review('A', 4),])
-    r2 = make_restaurant('B', [-9, 1], [], 3, [make_review('B', 5), make_review('B', 3.5),])
-    c1 = [0, 0]
-    groups = group_by_centroid([r1, r2], [c1])
-    b = [[r1, r2]]
-    print(groups is b, groups == b)
-    a = 1
