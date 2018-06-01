@@ -21,14 +21,6 @@ def find_closest(location, centroids):
     # BEGIN Question 3
     "*** YOUR CODE HERE ***"
     assert location and centroids
-    minimum_dist, minimum_idx = distance(location, centroids[0]), 0
-    for idx, centroid in enumerate(centroids):
-        current_dist = distance(location, centroid)
-        if current_dist < minimum_dist:
-            minimum_dist = current_dist
-            minimum_idx = idx
-    return centroids[minimum_idx]
-
     return min(centroids, key=lambda x: distance(x, location))
     # END Question 3
 
@@ -62,14 +54,10 @@ def group_by_centroid(restaurants, centroids):
 
     bucket = [[] for _ in centroids]
     for r in restaurants:
-        if not isinstance(r, dict):
-            continue
-        nearest_centroid = find_closest(r['location'], centroids)
+        nearest_centroid = find_closest(restaurant_location(r), centroids)
         idx = centroids.index(nearest_centroid)
         bucket[idx].append(r)
     return [_ for _ in bucket if _]
-
-
 
     # END Question 4
 
@@ -78,6 +66,7 @@ def find_centroid(cluster):
     """Return the centroid of the locations of the restaurants in cluster."""
     # BEGIN Question 5
     "*** YOUR CODE HERE ***"
+    return [mean([restaurant_location(_)[0] for _ in cluster]), mean([restaurant_location(_)[1] for _ in cluster])]
     # END Question 5
 
 
@@ -92,6 +81,8 @@ def k_means(restaurants, k, max_updates=100):
         old_centroids = centroids
         # BEGIN Question 6
         "*** YOUR CODE HERE ***"
+        clusters = group_by_centroid(restaurants, centroids)
+        centroids = [find_centroid(cluster) for cluster in clusters]
         # END Question 6
         n += 1
     return centroids
@@ -234,3 +225,13 @@ def main(*args):
     else:
         centroids = [restaurant_location(r) for r in restaurants]
     draw_map(centroids, restaurants, ratings)
+
+
+if __name__ == '__main__':
+    r1 = make_restaurant('A', [-10, 2], [], 2, [make_review('A', 4),])
+    r2 = make_restaurant('B', [-9, 1], [], 3, [make_review('B', 5), make_review('B', 3.5),])
+    c1 = [0, 0]
+    groups = group_by_centroid([r1, r2], [c1])
+    b = [[r1, r2]]
+    print(groups is b, groups == b)
+    a = 1
