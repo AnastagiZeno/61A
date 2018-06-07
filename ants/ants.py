@@ -25,6 +25,8 @@ class Place(object):
         # Phase 1: Add an entrance to the exit
         # BEGIN Problem 2
         "*** YOUR CODE HERE ***"
+        if exit:
+            exit.entrance = self
         # END Problem 2
 
     def add_insect(self, insect):
@@ -174,6 +176,7 @@ class HarvesterAnt(Ant):
 
     name = 'Harvester'
     implemented = True
+    food_cost = 2
 
     def action(self, colony):
         """Produce 1 additional food for the COLONY.
@@ -182,6 +185,7 @@ class HarvesterAnt(Ant):
         """
         # BEGIN Problem 1
         "*** YOUR CODE HERE ***"
+        colony.food += 1
         # END Problem 1
 
 
@@ -191,6 +195,7 @@ class ThrowerAnt(Ant):
     name = 'Thrower'
     implemented = True
     damage = 1
+    food_cost = 3
 
     def nearest_bee(self, hive):
         """Return the nearest Bee in a Place that is not the HIVE, connected to
@@ -199,7 +204,17 @@ class ThrowerAnt(Ant):
         This method returns None if there is no such Bee (or none in range).
         """
         # BEGIN Problem 3 and 4
-        return random_or_none(self.place.bees)
+        # return random_or_none(self.place.bees)
+        bee_here = random_or_none(self.place.bees)
+        entrance = self.place.entrance
+        while entrance and entrance is not hive:
+            bee_there = random_or_none(entrance.bees)
+            if bee_there:
+                break
+            entrance = entrance.entrance
+        else:
+            bee_there = None
+        return bee_here or bee_there
         # END Problem 3 and 4
 
     def throw_at(self, target):
@@ -844,3 +859,4 @@ def run(*args):
     Insect.reduce_armor = class_method_wrapper(Insect.reduce_armor,
             pre=print_expired_insects)
     start_with_strategy(args, interactive_strategy)
+
