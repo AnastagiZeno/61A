@@ -475,6 +475,7 @@ class QueenAnt(ScubaThrower):  # You should change this line
     implemented = True   # Change to True to view in the GUI
     # END Problem 13
     true_queen_born = False
+    buffed_ants = []
 
     def __init__(self):
         # BEGIN Problem 13
@@ -503,17 +504,16 @@ class QueenAnt(ScubaThrower):  # You should change this line
                 self.reduce_armor(1)
             return
 
-        buffed_ants = []
         following_place = self.place.exit
 
         while following_place:
-            if following_place.ant and following_place.ant not in buffed_ants:
+            if following_place.ant and following_place.ant not in self.buffed_ants:
                 following_place.ant.damage *= 2
-                buffed_ants.append(following_place.ant)
-                if hasattr(following_place.ant, 'container') and following_place.ant.container and following_place.ant.ant:
-                    if following_place.ant.ant not in buffed_ants:
-                        following_place.ant.ant.damage *= 2
-                        buffed_ants.append(following_place.ant.ant)
+                self.buffed_ants.append(following_place.ant)
+            if hasattr(following_place.ant, 'container') and following_place.ant.container and following_place.ant.ant:
+                if following_place.ant.ant not in self.buffed_ants:
+                    following_place.ant.ant.damage *= 2
+                    self.buffed_ants.append(following_place.ant.ant)
             following_place = following_place.exit
         super(QueenAnt, self).action(colony)
 

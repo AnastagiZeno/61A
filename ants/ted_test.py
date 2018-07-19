@@ -46,6 +46,17 @@ def test():
     for ant, dmg in zip(buffed_ants, old_dmgs):
         assert ant.damage == dmg * 2, "{0}'s damage is {1}, but should be {2}".format(ant, ant.damage, dmg * 2)
 
+     # Turn 2
+    thrower1 = ants.ThrowerAnt()
+    thrower2 = ants.ThrowerAnt()
+    queen_tunnel[6].add_insect(thrower1)  # Add thrower1 in TankAnt
+    queen_tunnel[5].add_insect(thrower2)
+    buffed_ants.extend([thrower1, thrower2])
+    old_dmgs.extend([ant.damage for ant in [thrower1, thrower2]])
+    queen.action(colony)
+    for ant, dmg in zip(buffed_ants, old_dmgs):
+        assert ant.damage == dmg * 2, "{0}'s damage is {1}, but should be {2}".format(ant, ant.damage, dmg * 2)
+
 
 test()
 
