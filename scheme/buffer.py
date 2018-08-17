@@ -125,3 +125,14 @@ class LineReader:
                 self.prompt = ' ' * len(self.prompt)
             yield line
         raise EOFError
+
+
+# if __name__ == '__main__':
+#     from scheme_tokens import tokenize_lines
+#     from scheme_reader import *
+#
+#     x = read_tail(Buffer(tokenize_lines(['2 (3 4))'])))
+#
+#     print()
+
+
